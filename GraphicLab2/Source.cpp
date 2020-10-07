@@ -1,4 +1,4 @@
-ï»¿#include<math.h>
+#include<math.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -7,9 +7,9 @@
 #include <vector>
 
 #if defined(linux) || defined(_WIN32)
-#include"GL\glut.h"/*Ğ”Ğ»ÑLinux Ğ¸ Windows*/
+#include"C:\Program Files (x86)\Microsoft Visual Studio 11.0\GL\glut.h"/*ÄëÿLinux è Windows*/
 #else
-#include<GLUT/GLUT.h>/*Ğ”Ğ»Ñ Mac OS*/
+#include<GLUT/GLUT.h>/*Äëÿ Mac OS*/
 #endif
 
 
@@ -50,9 +50,23 @@ int main(int argc, char* argv[]) {
 void pressedKey(int key, int x, int y) {
 	switch (key) {
 	case GLUT_KEY_UP:
-		planeD++; break;
+		if (planeY <0)
+		planeD++; 
+		else planeD--;
+		break;
 	case GLUT_KEY_DOWN:
-		planeD--; break;
+		if (planeY <0)
+		planeD--; 
+		else planeD++;
+		break;
+	case GLUT_KEY_LEFT:
+		planeX+=0.2; break;
+	case GLUT_KEY_RIGHT:
+		planeX-=0.2; break;
+	case GLUT_KEY_F1:
+		planeY *= -1;
+		planeD *= -1;
+		break;
 	default: break;
 	}
 	display();
@@ -77,11 +91,11 @@ void readFromFile(string path)
 		int pointNumber;
 		Point p;
 		f >> pointNumber;
-		for (int i = 0; i < pointNumber;i++)
+		for (int i = 0; i < pointNumber; i++)
 		{
 			f >> p.x >> p.y;
 			points.push_back(p);
-			cout << p.x << " " << p.y << endl;
+	//		cout << p.x << " " << p.y << endl;
 		}
 		cout << endl;
 		int movesNumber, m;
@@ -90,9 +104,9 @@ void readFromFile(string path)
 		{
 			f >> m;
 			code.push_back(m);
-			cout << m << endl;
+	//		cout << m << endl;
 		}
-		cout << endl;
+	//	cout << endl;
 	}
 	f.close();
 }
@@ -143,17 +157,19 @@ void display() {
 
 	glEnable(GL_CLIP_PLANE0);
 	//x y z d
-	
-	GLdouble arr[4] = { planeX,planeY,planeZ,planeD };
+	//Ax+By+d = 0
+	//Ax+By = -d
+	GLdouble arr[4] = { planeX, planeY, planeZ, planeD };
 	glClipPlane(GL_CLIP_PLANE0, arr);
 	glColor3d(1, 1, 1);
 	glBegin(GL_LINES);
-	glVertex2i(0, -1*planeY*planeD);
-	glVertex2i(MAXX, -1 * planeY*planeD);
+	glVertex2i(0, -1*planeD/planeY);
+	glVertex2i(MAXX,-1*(planeD+MAXX*planeX)/planeY);
 	glEnd();
+	cout << "X: " << planeX << " Y: " << planeY << " Z:" << planeZ << " D: " << planeD << endl;
+ 
 
-
-/*
+	/*
 	float shiftX = 5;
 	float shiftY = 5;
 	readFromFile("points.txt");
@@ -168,6 +184,6 @@ void display() {
 	drawOrMove(0, 0);
 
 	glDisable(GL_CLIP_PLANE0);
-	
+
 	glutSwapBuffers();
 }
