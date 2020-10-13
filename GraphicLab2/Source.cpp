@@ -7,7 +7,7 @@
 #include <vector>
 
 #if defined(linux) || defined(_WIN32)
-#include"C:\Program Files (x86)\Microsoft Visual Studio 11.0\GL\glut.h"/*ÄëÿLinux è Windows*/
+#include"GL\glut.h"/*ÄëÿLinux è Windows*/
 #else
 #include<GLUT/GLUT.h>/*Äëÿ Mac OS*/
 #endif
@@ -20,22 +20,27 @@ struct Point {
 	float y;
 };
 
-const int MINX = 0, MINY = 0, MAXX = 15, MAXY = 10;
+const int MINX = 0, MINY = 0, MAXX = 15, MAXY = 15;
 vector <Point> points;
 list <int> code;
+
+
 Point currPoint;
 
-GLdouble planeX = 0;
-GLdouble planeY = -1;
+GLdouble planeX = -1;
+GLdouble planeY = 1;
 GLdouble planeZ = 0;
-GLdouble planeD = 5;
+GLdouble planeD = 0;
 
-
+void readFromFile(string path);
 void reshape(int w, int h);
 void display();
 void pressedKey(int key, int x, int y);
 
 int main(int argc, char* argv[]) {
+	readFromFile("a.txt");
+	readFromFile("s.txt");
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(800, 500);
@@ -67,6 +72,11 @@ void pressedKey(int key, int x, int y) {
 		planeY *= -1;
 		planeD *= -1;
 		break;
+	case GLUT_KEY_F2:
+		planeX = -1;
+		planeY = 1;
+		planeD = 0;
+		break;
 	default: break;
 	}
 	display();
@@ -88,23 +98,47 @@ void readFromFile(string path)
 	fstream f(path, ios::in);
 	cout << path << endl;
 	if (f.is_open()) {
-		int pointNumber;
-		Point p;
-		f >> pointNumber;
-		for (int i = 0; i < pointNumber; i++)
-		{
-			f >> p.x >> p.y;
-			points.push_back(p);
-	//		cout << p.x << " " << p.y << endl;
+		if (points.empty()) {
+			int pointNumber;
+			Point p;
+			f >> pointNumber;
+			for (int i = 0; i < pointNumber; i++)
+			{
+				f >> p.x >> p.y;
+				points.push_back(p);
+				//		cout << p.x << " " << p.y << endl;
+			}
+			cout << endl;
+			int movesNumber, m;
+			f >> movesNumber;
+			for (int i = 0; i < movesNumber; i++)
+			{
+				f >> m;
+				code.push_back(m);
+						cout << m << endl;
+			}
 		}
-		cout << endl;
-		int movesNumber, m;
-		f >> movesNumber;
-		for (int i = 0; i < movesNumber; i++)
-		{
-			f >> m;
-			code.push_back(m);
-	//		cout << m << endl;
+		else {
+			int shiftForDots = points.size();
+			int pointNumber;
+			Point p;
+			f >> pointNumber;
+			for (int i = 0; i < pointNumber; i++)
+			{
+				f >> p.x >> p.y;
+				points.push_back(p);
+				//		cout << p.x << " " << p.y << endl;
+			}
+			cout << endl;
+			int movesNumber, m;
+			f >> movesNumber;
+			for (int i = 0; i < movesNumber; i++)
+			{
+				f >> m;
+				m < 0 ? m-=shiftForDots : m += shiftForDots;
+				code.push_back(m);
+				cout << m << endl;
+			}
 		}
 	//	cout << endl;
 	}
@@ -144,8 +178,8 @@ void drawOrMove(float shiftX, float shiftY) {
 		}
 	}
 
-	code.clear();
-	points.clear();
+//	code.clear();
+//	points.clear();
 }
 
 void display() {
@@ -176,11 +210,11 @@ void display() {
 	drawOrMove(shiftX, shiftY);
 	*/
 
-	readFromFile("a.txt");
-	drawOrMove(0, 0);
+	//readFromFile("a.txt");
+	//drawOrMove(0, 0);
 
 
-	readFromFile("s.txt");
+	//readFromFile("s.txt");
 	drawOrMove(0, 0);
 
 	glDisable(GL_CLIP_PLANE0);
