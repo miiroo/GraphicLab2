@@ -7,8 +7,8 @@
 #include <vector>
 
 #if defined(linux) || defined(_WIN32)
-//#include"C:\Program Files (x86)\Microsoft Visual Studio 11.0\GL\glut.h"/*ÄëÿLinux è Windows*/
-#include"GL\glut.h"
+#include"C:\Program Files (x86)\Microsoft Visual Studio 11.0\GL\glut.h"/*ÄëÿLinux è Windows*/
+//#include"GL\glut.h"
 #else
 #include<GLUT/GLUT.h>/*Äëÿ Mac OS*/
 #endif
@@ -139,7 +139,7 @@ void moveTo(int mto, float shiftX, float shiftY) {
 void drawTo(int dto, float shiftX, float shiftY) {
 		Point p = points[dto - 1];
 		if (dto > 14 && dto != 20 && dto !=26) {
-			float arr[3][3];
+			float arr[4][3];
 			arr[0][0] = currPoint.x;
 			arr[0][1] = currPoint.y;
 			arr[0][2] = currPoint.z;
@@ -152,18 +152,47 @@ void drawTo(int dto, float shiftX, float shiftY) {
 			if (currPoint.y == p.y && p.y > 4) arr[1][1] = p.y + 0.8;
 			else {
 				if (currPoint.y == p.y && p.y <= 4)  arr[1][1] = p.y - 0.8;
-				else 
-					arr[1][1] = (currPoint.y + p.y) / 2;
+				else {
+					if (p.x < currPoint.x && p.y >4) arr[1][1] = ((currPoint.y + p.y) / 2) + 0.5;
+					else {
+						if (p.x < currPoint.x && p.y <= 4) arr[1][1] = ((currPoint.y + p.y) / 2) - 0.5;
+						else {
+							if (p.x > currPoint.x && p.y > 4) arr[1][1] = ((currPoint.y + p.y) / 2) + 0.2;
+							else arr[1][1] = ((currPoint.y + p.y) / 2) - 0.2;
+						}
+					}
+				}
 			}
+			/*
+
+			currPoint.x == p.x ? arr[2][0] = p.x - 0.3 : arr[2][0] = ((currPoint.x + p.x) / 2) + 0.2;
+
+			if (currPoint.y == p.y && p.y > 4) arr[2][1] = p.y + 0.8;
+			else {
+				if (currPoint.y == p.y && p.y <= 4)  arr[2][1] = p.y - 0.8;
+				else {
+					if (p.x < currPoint.x && p.y >4) arr[2][1] = ((currPoint.y + p.y) / 2) + 0.5;
+					else {
+						if (p.x < currPoint.x && p.y <= 4) arr[2][1] = ((currPoint.y + p.y) / 2) - 0.5;
+						else {
+							if (p.x > currPoint.x && p.y > 4) arr[2][1] = ((currPoint.y + p.y) / 2) + 0.2;
+							else arr[2][1] = ((currPoint.y + p.y) / 2) - 0.2;
+						}
+					}
+				}
+			}
+			*/
 
 			arr[1][2] = 0;
-			
-			GLfloat node[8] = { 0, 0, 0, 1, 1, 1};
+		//	arr[2][2] = 0;
+
+			GLfloat node[6] = { 0, 0, 0, 1, 1, 1};
 			GLUnurbs* nurbs = gluNewNurbsRenderer();
 			gluBeginCurve(nurbs);
 			gluNurbsCurve(nurbs, 6, node, 3, &arr[0][0], 3, GL_MAP1_VERTEX_3);
 			gluEndCurve(nurbs);
 		}
+
 		else {
 			Point p = points[dto - 1];
 			glColor3d(1, 1, 1);
